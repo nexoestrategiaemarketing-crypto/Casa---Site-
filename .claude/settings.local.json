@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(python -m http.server 8000)",
+      "Bash(curl -s http://localhost:8000/Casa+ -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s \"http://localhost:8000/Casa%2B%20Redesign.html\" -o /dev/null -w \"%{http_code}\")",
+      "mcp__Claude_in_Chrome__switch_browser",
+      "Bash(curl -s \"http://localhost:8000/Casa%2B%20Redesign.html\")",
+      "Bash(python3 -c ' *)",
+      "Bash(pkill -f \"http.server\")",
+      "Bash(python server.py)",
+      "Bash(curl -s \"http://localhost:8000/Casa%2B%20Redesign.html\" -I)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python -c \"import importlib; [print\\(m\\) for m in ['PIL','pillow_heif','wand'] if importlib.util.find_spec\\(m\\)]\")",
+      "Bash(ffmpeg -version)",
+      "Bash(magick -version)",
+      "Bash(python -c \"from PIL import Image; print\\('PIL ok'\\)\")",
+      "Bash(python -c \"import pillow_heif; print\\('pillow_heif ok'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python -c \"import pillow_heif; print\\('ok'\\)\")",
+      "Bash(ping -n 4 127.0.0.1)",
+      "Bash(ping -n 5 127.0.0.1)",
+      "Bash(ping -n 3 127.0.0.1)",
+      "Bash(ping -n 8 127.0.0.1)",
+      "Bash(ping -n 12 127.0.0.1)",
+      "Bash(dir \"C:\\\\Users\\\\mloli\\\\Documents\\\\Casa+ - Site\\\\assets\\\\\" | findstr team)",
+      "Read(//mnt/c/Users/mloli/Documents/Casa+ - Site/assets/**)",
+      "WebSearch"
+    ]
+  }
+}
