@@ -52,8 +52,8 @@ const PainSection = () => {
             </h2>
           </RevealDiv>
           <RevealDiv delay={0.15}>
-            <p style={{fontSize:18,lineHeight:1.55,color:'var(--ink-2)',width:540,height:'111.6px',justifySelf:'end'}}>
-              A boa notícia: em Palmas, famílias com renda familiar de até <br/><strong style={{color:'var(--ink)'}}>R$ 13.000</strong> podem financiar a casa própria pelo Minha Casa Minha Vida, com subsídio do governo e parcela <strong style={{color:'var(--ink)'}}>menor que<br/>o aluguel</strong> que pagam hoje.
+            <p style={{fontSize:18,lineHeight:1.55,color:'var(--ink-2)',maxWidth:540,justifySelf:'end'}}>
+              A boa notícia: em Palmas, famílias com renda familiar de até <strong style={{color:'var(--ink)'}}>R$ 13.000</strong> podem financiar a casa própria pelo Minha Casa Minha Vida, com subsídio do governo e parcela <strong style={{color:'var(--ink)'}}>menor que o aluguel</strong> que pagam hoje.
             </p>
           </RevealDiv>
         </div>
@@ -98,7 +98,7 @@ const PainSection = () => {
 //   projeto | capa | bairro | nome | valor | area | terreno | quartos | banheiros | vagas | tag | previsao | destaque | imagem | maps
 // "projeto" = nome da obra (agrupa as casas). "capa" = foto de capa da obra.
 // "imagem" e "capa" aceitam link público do Google Drive.
-const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/1-xjogS59UbDc1NT4Vi2IAla3QnRnNLs-pf7FjWbOeXI/export?format=csv&gid=0";
+const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/1CENbQit0jypRI6z1dCTgYuiyj6ChwIXa/export?format=csv&gid=1597742939";
 
 const FALLBACK_HOUSES = [
   {projeto:'Morada do Sol – Sucupira', capa:'assets/house-1.jpg', bairro:'Morada do Sol', nome:'Casa 2', valor:220000, area:59, terreno:150, quartos:2, banheiros:2, vagas:1, tag:'Pronta para morar', destaque:true,  imagem:'assets/house-1.jpg'},
@@ -143,7 +143,7 @@ const ProjectCard = ({projeto, casas}) => {
   const bairro = casas[0]?.bairro || '';
   const maps = casas[0]?.maps || '';
   const minValor = Math.min(...casas.map(c=>c.valor));
-  const minParcela = Math.min(...casas.map(c=>estimateParcel({price:c.valor,income:3500,fgts:0}).parcela));
+  const minParcela = Math.min(...casas.map(c=>estimateParcel({price:c.valor,income:minFaixaIncome(c.valor),fgts:0}).parcela));
   const disponiveis = casas.length;
 
   return (
@@ -238,7 +238,7 @@ const ProjectCard = ({projeto, casas}) => {
       {open && (
         <div style={{padding:'0 0 4px'}}>
           {casas.map((c, i) => {
-            const est = estimateParcel({price:c.valor,income:3500,fgts:0});
+            const est = estimateParcel({price:c.valor,income:minFaixaIncome(c.valor),fgts:0});
             return (
               <div key={i} style={{
                 display:'grid',gridTemplateColumns:'1fr auto',gap:14,alignItems:'center',
@@ -446,8 +446,8 @@ const ProcessSection = () => {
           </p>
         </RevealDiv>
 
+        {/* Desktop: grade com 5 ícones clicáveis */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(5, 1fr)',gap:0,position:'relative'}} className="process-grid">
-          {/* connecting line */}
           <div style={{
             position:'absolute',top:34,left:'10%',right:'10%',height:2,
             background:`linear-gradient(to right, var(--bordo) 0%, var(--bordo) ${active*25}%, var(--line) ${active*25}%, var(--line) 100%)`,
@@ -459,7 +459,7 @@ const ProcessSection = () => {
               <button key={i} onClick={()=>setActive(i)} style={{
                 display:'flex',flexDirection:'column',alignItems:'center',gap:12,
                 padding:'0 10px',cursor:'pointer',textAlign:'center',
-                background:'transparent',border:0,position:'relative',zIndex:1
+                background:'transparent',border:0,position:'relative',zIndex:1,color:'inherit'
               }}>
                 <div style={{
                   width:68,height:68,borderRadius:20,
@@ -481,8 +481,38 @@ const ProcessSection = () => {
           })}
         </div>
 
+        {/* Mobile: indicador de progresso com dots */}
+        <div className="process-mobile" style={{display:'none',flexDirection:'column',alignItems:'center',gap:20,marginBottom:8}}>
+          <div style={{
+            width:72,height:72,borderRadius:22,
+            background:'var(--bordo)',color:'#fff',
+            display:'flex',alignItems:'center',justifyContent:'center',
+            boxShadow:'0 10px 30px -8px oklch(0.42 0.13 25 / .4)'
+          }}>
+            {React.createElement(steps[active].icon, {size:30})}
+          </div>
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:11,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--ink-3)',fontWeight:700,marginBottom:4}}>
+              Passo {String(active+1).padStart(2,'0')} de 05 · {steps[active].tempo}
+            </div>
+            <div style={{fontFamily:'Archivo',fontSize:22,fontWeight:700,color:'var(--bordo)',letterSpacing:'-.015em'}}>
+              {steps[active].t}
+            </div>
+          </div>
+          <div style={{display:'flex',gap:6}}>
+            {steps.map((_,i)=>(
+              <button key={i} onClick={()=>setActive(i)} style={{
+                width: i===active ? 22 : 8, height:8, borderRadius:4,
+                background: i<=active ? 'var(--bordo)' : 'var(--line)',
+                border:0, padding:0, cursor:'pointer',
+                transition:'all .35s ease'
+              }}/>
+            ))}
+          </div>
+        </div>
+
         <div style={{
-          marginTop:40,padding:'30px 36px',
+          marginTop:32,padding:'28px 28px',
           background:'#fff',borderRadius:18,border:'1px solid var(--line)',
           display:'grid',gridTemplateColumns:'1fr auto',gap:30,alignItems:'center'
         }} className="process-detail">
@@ -496,7 +526,7 @@ const ProcessSection = () => {
           </div>
           <div style={{display:'flex',gap:10}}>
             <Btn variant="ghost" size="md" onClick={()=>setActive(Math.max(0,active-1))} style={{opacity: active===0?.4:1,pointerEvents:active===0?'none':'auto'}}>← Anterior</Btn>
-            <Btn variant="dark" size="md" onClick={()=>setActive(Math.min(4,active+1))}>
+            <Btn variant="dark" size="md" onClick={()=>setActive(active===4 ? 0 : Math.min(4,active+1))}>
               {active===4 ? 'Reiniciar' : 'Próximo →'}
             </Btn>
           </div>
@@ -504,8 +534,10 @@ const ProcessSection = () => {
       </div>
       <style>{`
         @media (max-width: 880px){
-          .process-grid{grid-template-columns:repeat(5, 1fr) !important;overflow-x:auto;padding-bottom:8px}
-          .process-detail{grid-template-columns:1fr !important}
+          .process-grid{display:none !important}
+          .process-mobile{display:flex !important}
+          .process-detail{grid-template-columns:1fr !important;padding:24px 20px !important}
+          .process-detail p{font-size:20px !important}
         }
       `}</style>
     </section>
@@ -517,7 +549,7 @@ const BenefitsStrip = () => {
   const b = [
     {i:Icon.Wallet, t:'Subsídio até R$ 49.500', d:'Do governo federal, sem pagar de volta.'},
     {i:Icon.Tag, t:'FGTS como entrada', d:'Use seu saldo. Não precisa ter dinheiro na poupança.'},
-    {i:Icon.Shield, t:'Parcelas fixas por 30 anos', d:'Sem surpresa. Sem correção pelo IPCA.'},
+    {i:Icon.Shield, t:'Parcelas fixas por 35 anos', d:'Sem surpresa. Sem correção pelo IPCA.'},
     {i:Icon.Spark, t:'Taxa a partir de 4% a.a.', d:'A menor do mercado habitacional, disponível na Faixa 1 do programa.'},
   ];
   return (
@@ -567,14 +599,15 @@ const TeamCard = ({pessoa:p, delay=0}) => {
         transform: hover ? 'translateY(-7px)' : 'translateY(0)',
       }}>
       {p.foto && (
-        <img src={p.foto} alt={p.nome} style={{
+        <img src={p.foto} alt={p.nome} className="team-photo" style={{
           position:'absolute', inset:0,
           width:'100%', height:'100%',
           objectFit:'cover', objectPosition:'top center',
           display:'block',
-          filter:'blur(0.4px)',
-          transition:'transform .65s cubic-bezier(.2,.7,.2,1)',
-          transform: hover ? 'scale(1.04)' : 'scale(1)',
+          willChange:'transform',
+          backfaceVisibility:'hidden',
+          transform: hover ? 'scale(1.05)' : 'scale(1)',
+          transition:'transform .6s cubic-bezier(.2,.7,.2,1)',
         }}/>
       )}
       {/* gradiente só na faixa do texto (últimos 32%) */}
@@ -610,7 +643,7 @@ const TeamSection = () => {
         'Pós-Grad. Gerenciamento de Obras — IPOG',
         'MBA Produtividade e Tecnologia da Construção',
       ],
-      foto: 'assets/team-edson.jpg?v=4',
+      foto: 'assets/team-edson.jpg?v=5',
     },
     {
       nome: 'José Victor',
@@ -619,7 +652,7 @@ const TeamSection = () => {
         'Eng. Civil — IFTO',
         'Pós-Grad. Perícias, Avaliações e Orçamentos — UNIMAIS',
       ],
-      foto: 'assets/team-jose-victor.jpg?v=4',
+      foto: 'assets/team-jose-victor.jpg?v=5',
     },
     {
       nome: 'Railton Pires',
@@ -627,7 +660,7 @@ const TeamSection = () => {
       formacao: [
         'Eng. Civil',
       ],
-      foto: 'assets/team-railton.jpg?v=4',
+      foto: 'assets/team-railton.jpg?v=5',
     },
   ];
 
@@ -659,11 +692,11 @@ const TeamSection = () => {
 // ================= DELIVERIES GALLERY =================
 const DeliveriesSection = () => {
   const fotos = [
-    {src:'assets/entrega-1.jpg', alt:'Família recebendo a chave da casa nova com a equipe Casa+'},
-    {src:'assets/entrega-2.jpg', alt:'Casal comemorando a entrega das chaves com a equipe Casa+'},
-    {src:'assets/entrega-3.jpg', alt:'Momento de entrega de chave — Casa+'},
-    {src:'assets/entrega-4.jpg', alt:'Família feliz na entrega da casa própria'},
-    {src:'assets/entrega-5.jpg', alt:'Entrega de chave — conquista da casa própria'},
+    {src:'assets/entrega-1.jpg?v=5', alt:'Família recebendo a chave da casa nova com a equipe Casa+'},
+    {src:'assets/entrega-2.jpg?v=5', alt:'Casal comemorando a entrega das chaves com a equipe Casa+'},
+    {src:'assets/entrega-3.jpg?v=5', alt:'Momento de entrega de chave — Casa+'},
+    {src:'assets/entrega-4.jpg?v=5', alt:'Família feliz na entrega da casa própria'},
+    {src:'assets/entrega-5.jpg?v=5', alt:'Entrega de chave — conquista da casa própria'},
   ];
 
   // Layout: linha 1 = foto grande (span 4) + foto média (span 2)
@@ -690,7 +723,7 @@ const DeliveriesSection = () => {
           gap:10,
         }} className="deliveries-grid">
           {fotos.map((f, i) => (
-            <RevealDiv key={i} delay={i*0.1} style={{
+            <RevealDiv key={i} delay={i*0.1} className="delivery-tile" style={{
               gridColumn: `span ${spans[i]}`,
               borderRadius:16,
               overflow:'hidden',
@@ -705,10 +738,9 @@ const DeliveriesSection = () => {
                   width:'100%', height:'100%',
                   objectFit:'cover',
                   objectPosition:'center 20%',
-                  transition:'transform .55s ease',
+                  willChange:'transform',
+                  backfaceVisibility:'hidden',
                 }}
-                onMouseEnter={e=>e.currentTarget.style.transform='scale(1.04)'}
-                onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}
               />
               {/* subtle gradient overlay at bottom */}
               <div style={{
@@ -747,6 +779,10 @@ const DeliveriesSection = () => {
         </RevealDiv>
       </div>
       <style>{`
+        .delivery-tile{transition:box-shadow .35s ease, opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1)}
+        .delivery-tile img{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+        .delivery-tile.in-view:hover{box-shadow:0 22px 44px -16px rgba(10,6,4,.45)}
+        .delivery-tile.in-view:hover img{transform:scale(1.05)}
         @media (max-width:860px){
           .deliveries-grid{grid-template-columns:repeat(2,1fr) !important}
           .deliveries-grid > div{grid-column:span 1 !important;aspect-ratio:4/5 !important}

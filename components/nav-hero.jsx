@@ -45,7 +45,7 @@ const Navbar = ({state, setState}) => {
         </nav>
 
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <a href={`tel:+5563999496259`} style={{
+          <a href={`tel:+5563999496259`} className="nav-phone" style={{
             display:'flex',alignItems:'center',gap:7,fontSize:13,fontWeight:600,
             color: scrolled ? 'var(--ink)' : '#fff'
           }}>
@@ -60,6 +60,7 @@ const Navbar = ({state, setState}) => {
       <style>{`
         @media (max-width: 960px){
           .nav-links{display:none !important}
+          .nav-phone{display:none !important}
         }
       `}</style>
     </header>
@@ -126,7 +127,7 @@ const Hero = ({state, simValues, setSimValues}) => {
             marginTop:24,fontSize:18,lineHeight:1.5,
             color:'rgba(255,255,255,.78)',maxWidth:520,fontWeight:400
           }}>
-            Casas prontas em Palmas com parcela que cabe no bolso, subsídio do governo e atendimento humano do primeiro clique até a chave na mão.
+            Casas prontas ou na planta em Palmas com parcela que cabe no bolso, subsídio do governo e atendimento humano do primeiro clique até a chave na mão.
           </p>
 
           <div style={{display:'flex',gap:12,marginTop:34,flexWrap:'wrap'}}>
@@ -191,10 +192,17 @@ const Hero = ({state, simValues, setSimValues}) => {
             display:'grid',gridTemplateColumns:'1fr 1fr',gap:14
           }}>
             <div>
-              <div style={{fontSize:11,color:'var(--ink-3)',letterSpacing:'.08em',textTransform:'uppercase',fontWeight:600}}>Parcela estimada</div>
+              <div style={{fontSize:11,color: est.capped ? 'oklch(0.45 0.15 30)' : 'var(--ink-3)',letterSpacing:'.08em',textTransform:'uppercase',fontWeight:600}}>
+                {est.capped ? 'Limite aprovável' : 'Parcela a partir de'}
+              </div>
               <div style={{fontFamily:'Archivo',fontSize:36,fontWeight:800,color:'var(--bordo)',letterSpacing:'-.035em',lineHeight:1,marginTop:4}}>
                 {fmtBRL(est.parcela)}<span style={{fontSize:13,color:'var(--ink-3)',fontWeight:500,fontFamily:'Inter'}}>/mês</span>
               </div>
+              {est.capped && (
+                <div style={{fontSize:11,color:'oklch(0.45 0.15 30)',marginTop:4,fontWeight:500}}>
+                  +{fmtBRL(est.entradaExtra)} entrada adicional necessária
+                </div>
+              )}
             </div>
             <div>
               <div style={{fontSize:11,color:'var(--ink-3)',letterSpacing:'.08em',textTransform:'uppercase',fontWeight:600}}>

@@ -6,6 +6,7 @@ const FullSimulator = ({simValues, setSimValues}) => {
     preco: simValues?.price || 220000,
     renda: simValues?.income || 1621,
     fgts:5000,
+    idade:35,
   });
 
   // Sincroniza quando o usuário muda os sliders na hero
@@ -15,7 +16,7 @@ const FullSimulator = ({simValues, setSimValues}) => {
     }
   }, [simValues?.price, simValues?.income]);
   const [sent, setSent] = React.useState(false);
-  const est = estimateParcel({price:form.preco, income:form.renda, fgts:form.fgts});
+  const est = estimateParcel({price:form.preco, income:form.renda, fgts:form.fgts, age:form.idade});
 
   const update = (k,v) => {
     setForm(s=>({...s, [k]:v}));
@@ -153,6 +154,16 @@ const FullSimulator = ({simValues, setSimValues}) => {
                       <Slider label="Saldo de FGTS (aproximado)" value={form.fgts} min={0} max={60000} step={500}
                         onChange={v=>update('fgts',v)} format={fmtBRL}/>
                     </div>
+                    <div style={{marginTop:24}}>
+                      <Slider label="Sua idade" value={form.idade} min={18} max={70} step={1}
+                        onChange={v=>update('idade',v)} format={v=>`${v} anos`}/>
+                      {est.prazoReduzido && (
+                        <div style={{marginTop:8,fontSize:12,color:'oklch(0.45 0.12 40)',fontWeight:500,display:'flex',gap:6,alignItems:'center'}}>
+                          <Icon.Clock size={13}/>
+                          Prazo reduzido para {est.n} meses ({Math.round(est.n/12)} anos) — financiamento até os 80 anos
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* aviso renda mínima */}
@@ -193,15 +204,32 @@ const FullSimulator = ({simValues, setSimValues}) => {
 
                   <div style={{marginTop:20,background:'var(--paper)',borderRadius:16,padding:'22px 24px',border:'1px solid var(--line-2)'}}>
                     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:18}}>
-                      <MetricBig label="Parcela estimada" value={fmtBRL(est.parcela)} sub="por 360 meses" tone="bordo"/>
+                      <MetricBig label="Parcela a partir de" value={fmtBRL(est.parcela)} sub={`${est.n} meses · ${Math.round(est.n/12)} anos`} tone="bordo"/>
                       <MetricBig label="Subsídio do governo" value={`até ${fmtBRL(est.subsidy)}`} sub="não precisa devolver" tone="success"/>
                     </div>
                     <div style={{borderTop:'1px dashed var(--line)',marginTop:18,paddingTop:16,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
                       <Metric label="Valor financiado" value={fmtBRL(est.financiado)}/>
-                      <Metric label="Entrada (FGTS)" value={fmtBRL(est.entrada)}/>
+                      <Metric label="Entrada em dinheiro" value={fmtBRL(est.entradaTotal)}/>
                       <Metric label="Comprometido" value={`${est.comprometido}%`} ok={est.comprometido<=30}/>
                     </div>
                   </div>
+
+                  {est.capped && (
+                    <div style={{marginTop:12,padding:'14px 16px',background:'oklch(0.96 0.04 55)',border:'1px solid oklch(0.88 0.08 55)',borderRadius:12,fontSize:13,color:'oklch(0.38 0.12 40)',display:'flex',gap:10,alignItems:'flex-start'}}>
+                      <Icon.Clock size={16} style={{flexShrink:0,marginTop:1}}/>
+                      <div style={{lineHeight:1.6}}>
+                        <strong>Entrada adicional necessária: {fmtBRL(est.entradaExtra)}</strong><br/>
+                        Com a entrada mínima de 20%, a parcela ficaria acima de 30% da sua renda. Para se enquadrar na regra da Caixa, você precisa dar mais <strong>{fmtBRL(est.entradaExtra)}</strong> de entrada, totalizando <strong>{fmtBRL(est.entradaTotal)}</strong>.
+                      </div>
+                    </div>
+                  )}
+
+                  {est.prazoReduzido && (
+                    <div style={{marginTop:8,padding:'10px 14px',background:'oklch(0.96 0.02 240)',borderRadius:10,fontSize:12,color:'oklch(0.4 0.08 240)',display:'flex',gap:8,alignItems:'center'}}>
+                      <Icon.Clock size={13}/>
+                      Prazo de {est.n} meses — reduzido pela sua idade ({form.idade} anos). Financiamento vai até os 80 anos.
+                    </div>
+                  )}
 
                   <div style={{marginTop:16,padding:'14px 16px',borderRadius:12,
                     background: est.viavel ? 'oklch(0.95 0.04 155)' : 'oklch(0.95 0.04 60)',
@@ -429,17 +457,17 @@ const FAQ = () => {
   const [open, setOpen] = React.useState(0);
   const items = [
     {q:'Eu posso financiar mesmo sendo autônomo ou MEI?',
-     a:'Sim. A Caixa aceita renda de autônomo, MEI e informal. A gente te orienta como comprovar (extratos, declaração, DAS). Muitos dos nossos clientes são autônomos.'},
+     a:'Sim. A Caixa aceita renda de autônomo, MEI e trabalhador informal. Para comprovar, são usados extratos bancários dos últimos 3 meses, declaração do imposto de renda, DAS (MEI) ou declaração de renda feita por contador. A gente te orienta em cada documento.'},
     {q:'Preciso ter nome limpo?',
-     a:'Nome sujo no SPC/Serasa não impede de imediato: depende da gravidade e tempo. Fazemos uma pré-análise sigilosa antes de qualquer consulta formal.'},
+     a:'Sim, ter o nome limpo é fundamental. A Caixa realiza consulta ao CPF no SPC/Serasa e no Cadastro Informativo (CADIN). Dívidas ativas em aberto impedem a aprovação. Antes de qualquer consulta formal, fazemos uma pré-análise gratuita e sigilosa para avaliar sua situação.'},
     {q:'Qual o valor da entrada?',
-     a:'A entrada mínima é 3% do valor. Você pode pagar com FGTS, não precisa ter dinheiro poupado. Quanto mais FGTS, menor sua parcela.'},
+     a:'A entrada mínima é de 20% do valor do imóvel. O FGTS pode ser usado para cobrir total ou parcialmente esse valor — se o saldo for suficiente, você não precisa ter dinheiro em caixa. O subsídio do governo é abatido antes do cálculo, reduzindo ainda mais o que precisa ser financiado.'},
     {q:'Quanto tempo leva do cadastro até a chave?',
-     a:'Em média 45 a 90 dias. A aprovação na Caixa leva 5 a 20 dias; depois é assinatura, avaliação do imóvel e registro. Casas prontas entregam mais rápido.'},
+     a:'Em média 45 a 90 dias para casas prontas. A aprovação de crédito na Caixa leva de 5 a 20 dias úteis; depois vem a assinatura do contrato, vistoria e registro em cartório. A Casa+ acompanha cada etapa para que não haja atrasos desnecessários.'},
     {q:'Posso pagar mais barato que o aluguel que pago hoje?',
-     a:'Na maioria dos casos, sim. Com o subsídio do governo e a parcela fixa do MCMV, o custo mensal costuma ser bem menor que o aluguel equivalente em Palmas — especialmente para quem se enquadra nas Faixas 1 e 2. Fale com a gente para simular o seu caso.'},
-    {q:'E se depois eu quiser vender ou sair?',
-     a:'A casa é sua. Pode vender, alugar ou transferir o financiamento. Só pede carência mínima de alguns anos para transferir subsídio.'},
+     a:'Na maioria dos casos para quem está nas Faixas 1 e 2, sim. Com subsídio de até R$ 49.500 do governo federal e juros a partir de 4% ao ano, a parcela costuma ser igual ou menor que o aluguel que você paga hoje — e cada pagamento é um passo para a casa ser sua. Simule agora para ver seu número real.'},
+    {q:'E se depois eu quiser vender o imóvel?',
+     a:'Você pode vender o imóvel, mas existem regras importantes: na Faixa 1, há um período de carência — durante o financiamento ativo você não pode vender sem quitar ou obter autorização da Caixa. Nas Faixas 2, 3 e 4 é possível transferir o financiamento para o comprador com aprovação da Caixa. Importante: alugar o imóvel é proibido enquanto o financiamento estiver ativo em qualquer faixa — a casa deve ser usada como residência própria.'},
   ];
   return (
     <section data-screen-label="faq" id="faq" style={{padding:'100px 0',background:'var(--paper)'}}>
@@ -472,7 +500,7 @@ const FAQ = () => {
                     width:'100%',textAlign:'left',
                     display:'flex',justifyContent:'space-between',alignItems:'center',
                     padding:'20px 0',gap:16,
-                    background:'transparent',cursor:'pointer'
+                    background:'transparent',cursor:'pointer',color:'var(--ink)'
                   }}>
                     <div style={{fontFamily:'Archivo',fontSize:19,fontWeight:700,letterSpacing:'-.015em',lineHeight:1.35,flex:1}}>
                       {it.q}
@@ -514,7 +542,7 @@ const FinalCTA = () => (
         <h2 style={{fontSize:'clamp(40px, 5vw, 72px)',fontWeight:500,marginTop:22,letterSpacing:'-.028em',lineHeight:.98}}>
           Daqui a 12 meses<br/>
           você pode estar<br/>
-          <em style={{fontStyle:'italic',color:'var(--bordo-light)'}}>na sua casa.</em>
+          <em style={{fontStyle:'italic',color:'var(--bordo-light)'}}>na sua casa</em>
         </h2>
         <p style={{fontSize:19,lineHeight:1.5,color:'rgba(255,255,255,.78)',marginTop:24,maxWidth:520}}>
           Ou pagando mais 12 meses de aluguel. A decisão começa com uma conversa de 10 minutos.
@@ -539,9 +567,14 @@ const Footer = () => (
       <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr 1fr 1fr',gap:40,marginBottom:50}} className="footer-grid">
         <RevealDiv>
           <Icon.Logo size={44} inverted={true}/>
-          <p style={{fontSize:14,lineHeight:1.6,marginTop:18,maxWidth:320}}>
-            A casa que muda sua história. Especialistas em Minha Casa Minha Vida em Palmas · TO há 6 anos.
-          </p>
+          <ul style={{listStyle:'none',padding:0,margin:'16px 0 0',display:'flex',flexDirection:'column',gap:8,fontSize:13,color:'rgba(255,255,255,.65)'}}>
+            {['A casa que muda sua história','Especialistas em Minha Casa Minha Vida','Palmas · Tocantins · 6 anos de mercado','Habilitada pela Caixa Econômica Federal'].map((item,i)=>(
+              <li key={i} style={{display:'flex',alignItems:'center',gap:8}}>
+                <span style={{width:4,height:4,borderRadius:'50%',background:'var(--bordo-light)',flexShrink:0,display:'inline-block'}}/>
+                {item}
+              </li>
+            ))}
+          </ul>
           <div style={{marginTop:22,display:'flex',gap:10}}>
             <a href="https://instagram.com/casamais.to" target="_blank" rel="noopener" style={{width:38,height:38,borderRadius:'50%',background:'rgba(255,255,255,.08)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff'}}>
               <Icon.Instagram size={16}/>

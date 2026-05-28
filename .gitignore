@@ -1,0 +1,9 @@
+# Backups locais das fotos originais (não precisam ir pro site)
+assets/_originals/
+
+# Config e arquivos internos do Claude
+.claude/
+
+# Dependências e uploads locais
+node_modules/
+uploads/

@@ -5,42 +5,62 @@ const PHONE_DISPLAY = "(63) 99949-6259";
 const fmtBRL = (v) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
 const fmtBRLd = (v) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
 
-// MCMV parcel estimator: oficial Caixa
-// F1: ≤3.200  | ≤255k | 4-4,75% | subsídio ≤49.500
-// F2: 3.200,01-5.000 | ≤255k | 5-7% | subsídio menor
-// F3: 5.000,01-9.600 | ≤400k | 7,66-8,16% | sem subsídio
-// F4: 9.600,01-13.000 | ≤600k | 10% | sem subsídio
-// Cota máx 80% | 420 parcelas | Parcela ≤ 30% renda
-// Calibrado com exemplo: Renda 2k, imóvel 200k → sub 49.500, entrada 24.167,80, parcela 600
-function estimateParcel({price, income, fgts=0}){
+// MCMV parcel estimator: oficial Caixa (atualizado 2025)
+// F1: renda ≤3.200  | imóvel ≤255k | juros 4% a.a. | subsídio até R$55.000
+// F2: renda 3.200-5.000 | imóvel ≤255k | juros 5-7% a.a. | subsídio até R$30.000
+// F3: renda 5.000-9.600 | imóvel ≤400k | juros 7,66-8,16% a.a. | sem subsídio
+// F4: renda 9.600-13.000 | imóvel ≤600k | juros 10% a.a. | sem subsídio
+// Prazo máximo: 360 meses (30 anos) | Entrada mínima: 20% do valor
+function estimateParcel({price, income, fgts=0, age=35}){
   let faixa, juros, subsidyMax, imovelMax;
   if(income <= 3200)      { faixa=1; juros=0.04;   subsidyMax=49500; imovelMax=255000; }
-  else if(income <= 5000) { faixa=2; juros=0.05;   subsidyMax=25000; imovelMax=255000; }
+  else if(income <= 5000) { faixa=2; juros=0.05;   subsidyMax=30000; imovelMax=255000; }
   else if(income <= 9600) { faixa=3; juros=0.0791; subsidyMax=0;     imovelMax=400000; }
   else                    { faixa=4; juros=0.10;   subsidyMax=0;     imovelMax=600000; }
 
-  // subsídio: máximo para rendas baixas, decresce até zerar no topo da faixa
+  // subsídio: máximo para rendas mais baixas, decresce até zerar no topo da faixa
   let subsidy = 0;
-  if(faixa===1)      subsidy = Math.round(49500 * (1 - Math.max(0,(income-2000))/1500));
-  else if(faixa===2) subsidy = Math.round(25000 * (1 - (income-3200)/1800));
-  subsidy = Math.max(0, Math.min(subsidy, subsidyMax, price*0.35));
+  if(faixa===1)      subsidy = Math.round(49500 * (1 - Math.max(0,(income-2000))/1400));
+  else if(faixa===2) subsidy = Math.round(30000 * (1 - (income-3200)/1800));
+  subsidy = Math.max(0, Math.min(subsidy, subsidyMax, price*0.40));
 
-  // entrada: ~16% do saldo após subsídio (calibrado com exemplo oficial)
-  // menos FGTS que o cliente já tem
-  const entradaBase = (price - subsidy) * 0.16;
-  const entradaEfetiva = Math.max(0, entradaBase - fgts);
-  const financiado = Math.max(10000, price - subsidy - fgts - entradaEfetiva);
+  // Prazo limitado pela idade: banco financia até os 80 anos | máx 420 meses (35 anos)
+  const n = Math.max(60, Math.min(420, (80 - age) * 12));
+  const prazoReduzido = n < 360;
 
-  // tabela price, 420 meses (35 anos: máx do programa)
-  const i = juros/12;
-  const n = 420;
-  const pmt = financiado * (i*Math.pow(1+i,n))/(Math.pow(1+i,n)-1);
-  // seguros MIP+DFI + taxa admin
-  const seguros = financiado * 0.00028 + 25;
-  const total = pmt + seguros;
+  // Entrada mínima 20% após subsídio; FGTS abate da entrada e do saldo devedor
+  const valorLiq = Math.max(0, price - subsidy);
+  const entrada20 = valorLiq * 0.20;
+  const fgtsEntrada = Math.min(fgts, entrada20);
+  const fgtsExtra  = Math.max(0, fgts - entrada20);
+  const entradaCash = Math.max(0, entrada20 - fgtsEntrada);
+  let financiado = Math.max(0, valorLiq * 0.80 - fgtsExtra);
 
-  const comprometido = total / income;
-  const viavel = comprometido <= 0.30 && income >= 1621 && price <= imovelMax;
+  // Tabela Price; seguros MIP+DFI + taxa adm (~0,028%/mês + R$25)
+  const i = juros / 12;
+  const pow = Math.pow(1 + i, n);
+  const pmtFactor = i > 0 ? (i * pow) / (pow - 1) : 1 / n;
+  const segTaxa = 0.00028;
+
+  const calcTotal = (f) => f * pmtFactor + f * segTaxa + 25;
+
+  const parcelaMax = Math.floor(income * 0.30);
+  const totalBase = calcTotal(financiado);
+
+  // Se parcela com entrada mínima > 30% da renda, aumenta a entrada
+  let entradaExtra = 0;
+  if (totalBase > parcelaMax && financiado > 0) {
+    // Inverso: descobre o financiado máximo que resulta em parcela = parcelaMax
+    const financiadoMax = Math.max(0, (parcelaMax - 25) / (pmtFactor + segTaxa));
+    entradaExtra = Math.round(Math.max(0, financiado - financiadoMax));
+    financiado = Math.max(0, financiado - entradaExtra);
+  }
+
+  const totalFinal = calcTotal(financiado);
+  const capped = entradaExtra > 0;
+  const comprometido = totalFinal / income;
+  const viavel = comprometido <= 0.30 && income >= 1621 && price <= imovelMax && financiado > 0;
+  const parcelaMax30 = parcelaMax;
 
   return {
     faixa,
@@ -48,11 +68,24 @@ function estimateParcel({price, income, fgts=0}){
     imovelMax,
     subsidy: Math.round(subsidy),
     financiado: Math.round(financiado),
-    entrada: Math.round(entradaEfetiva),
-    parcela: Math.round(total),
-    comprometido: Math.round(comprometido*100),
+    entrada: Math.round(entradaCash),
+    entradaExtra,
+    entradaTotal: Math.round(entradaCash + entradaExtra),
+    parcela: Math.round(totalFinal),
+    parcelaMax: parcelaMax30,
+    capped,
+    n,
+    prazoReduzido,
+    comprometido: Math.round(comprometido * 100),
     viavel
   };
+}
+
+// Retorna a renda mínima da faixa MCMV elegível para o preço do imóvel
+function minFaixaIncome(price) {
+  if (price <= 255000) return 1621;  // Faixa 1 — salário mínimo
+  if (price <= 400000) return 5001;  // Faixa 3 (F1/F2 max é 255k)
+  return 9601;                        // Faixa 4
 }
 
 // Buttons
@@ -147,4 +180,4 @@ const RevealDiv = ({children, delay=0, style={}, className='', ...props}) => {
   );
 };
 
-Object.assign(window, { WHATSAPP_URL, PHONE_DISPLAY, fmtBRL, fmtBRLd, estimateParcel, Btn, WhatsLink, Pill, ImgPh, RevealDiv });
+Object.assign(window, { WHATSAPP_URL, PHONE_DISPLAY, fmtBRL, fmtBRLd, estimateParcel, minFaixaIncome, Btn, WhatsLink, Pill, ImgPh, RevealDiv });
