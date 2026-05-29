@@ -207,7 +207,7 @@ const FullSimulator = ({simValues, setSimValues}) => {
                       <MetricBig label="Parcela a partir de" value={fmtBRL(est.parcela)} sub={`${est.n} meses · ${Math.round(est.n/12)} anos`} tone="bordo"/>
                       <MetricBig label="Subsídio do governo" value={`até ${fmtBRL(est.subsidy)}`} sub="não precisa devolver" tone="success"/>
                     </div>
-                    <div style={{borderTop:'1px dashed var(--line)',marginTop:18,paddingTop:16,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
+                    <div className="sim-metrics-3" style={{borderTop:'1px dashed var(--line)',marginTop:18,paddingTop:16,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
                       <Metric label="Valor financiado" value={fmtBRL(est.financiado)}/>
                       <Metric label="Entrada em dinheiro" value={fmtBRL(est.entradaTotal)}/>
                       <Metric label="Comprometido" value={`${est.comprometido}%`} ok={est.comprometido<=30}/>
@@ -241,7 +241,7 @@ const FullSimulator = ({simValues, setSimValues}) => {
                       : <span>Vamos avaliar juntos. Existem caminhos mesmo assim.</span>}
                   </div>
 
-                  <div style={{display:'flex',gap:10,marginTop:22}}>
+                  <div className="sim-actions" style={{display:'flex',gap:10,marginTop:22}}>
                     <Btn variant="ghost" size="lg" onClick={()=>setStep(1)}>← Ajustar</Btn>
                     <Btn variant="primary" size="lg" style={{flex:1}} onClick={()=>setStep(3)} iconRight={<Icon.Arrow size={16}/>}>
                       Receber proposta personalizada
@@ -262,7 +262,7 @@ const FullSimulator = ({simValues, setSimValues}) => {
                     <Field label="Cidade" value={form.cidade} onChange={v=>update('cidade',v)} placeholder="Palmas"/>
                   </div>
 
-                  <div style={{display:'flex',gap:10,marginTop:22}}>
+                  <div className="sim-actions" style={{display:'flex',gap:10,marginTop:22}}>
                     <Btn variant="ghost" size="lg" type="button" onClick={()=>setStep(2)}>← Voltar</Btn>
                     <Btn variant="primary" size="lg" type="submit" style={{flex:1,opacity:canSend?1:.5,pointerEvents:canSend?'auto':'none'}}
                       iconRight={<Icon.Arrow size={16}/>}>
@@ -295,7 +295,14 @@ const FullSimulator = ({simValues, setSimValues}) => {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 960px){ .sim-grid{grid-template-columns:1fr !important;gap:40px !important} }`}</style>
+      <style>{`
+        @media (max-width: 960px){ .sim-grid{grid-template-columns:1fr !important;gap:40px !important} }
+        @media (max-width: 520px){
+          .sim-actions{flex-direction:column !important}
+          .sim-actions > *{width:100% !important; flex:none !important}
+          .sim-metrics-3{grid-template-columns:1fr 1fr !important}
+        }
+      `}</style>
     </section>
   );
 };
