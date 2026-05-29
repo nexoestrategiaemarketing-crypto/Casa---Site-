@@ -630,7 +630,7 @@ const Footer = () => (
           <span>LGPD</span>
         </div>
         <div style={{color:'rgba(255,255,255,.25)',fontSize:11,letterSpacing:'.04em'}}>
-          Desenvolvido por <a href="https://nexoestrategia.com.br" target="_blank" rel="noopener noreferrer" style={{color:'rgba(255,255,255,.4)',textDecoration:'none',fontWeight:600,transition:'color .2s'}}
+          Desenvolvido por <a href="https://nexolinks.framer.ai/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGnl5somnVilsXLqIlS-2TIAwpMI7GZOUGC-mY7Bar6UXXrH2feQWIirnwqoOc_aem_bIh-ZMjzdsV8LS17J6ly9Q" target="_blank" rel="noopener noreferrer" style={{color:'rgba(255,255,255,.4)',textDecoration:'none',fontWeight:600,transition:'color .2s'}}
             onMouseEnter={e=>e.currentTarget.style.color='rgba(255,255,255,.75)'}
             onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,.4)'}>
             Nexo
