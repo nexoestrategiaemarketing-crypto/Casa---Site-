@@ -622,12 +622,19 @@ const Footer = () => (
           </ul>
         </RevealDiv>
       </div>
-      <div style={{paddingTop:24,borderTop:'1px solid rgba(255,255,255,.08)',display:'flex',justifyContent:'space-between',flexWrap:'wrap',gap:12,fontSize:12}}>
+      <div style={{paddingTop:24,borderTop:'1px solid rgba(255,255,255,.08)',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12,fontSize:12}}>
         <div>© {new Date().getFullYear()} Casa+. Todos os direitos reservados.</div>
         <div style={{display:'flex',gap:22,color:'rgba(255,255,255,.4)'}}>
           <span>Política de privacidade</span>
           <span>Termos de uso</span>
           <span>LGPD</span>
+        </div>
+        <div style={{color:'rgba(255,255,255,.25)',fontSize:11,letterSpacing:'.04em'}}>
+          Desenvolvido por <a href="https://nexoestrategia.com.br" target="_blank" rel="noopener noreferrer" style={{color:'rgba(255,255,255,.4)',textDecoration:'none',fontWeight:600,transition:'color .2s'}}
+            onMouseEnter={e=>e.currentTarget.style.color='rgba(255,255,255,.75)'}
+            onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,.4)'}>
+            Nexo
+          </a>
         </div>
       </div>
     </div>
