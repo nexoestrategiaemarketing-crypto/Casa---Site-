@@ -297,6 +297,8 @@ const ProjectCard = ({projeto, casas}) => {
 const HousesSection = () => {
   const [houses, setHouses] = React.useState(FALLBACK_HOUSES);
   const [loading, setLoading] = React.useState(!!SHEETS_CSV_URL);
+  const [showAll, setShowAll] = React.useState(false);
+  const INITIAL_COUNT = 3;
 
   React.useEffect(() => {
     if (!SHEETS_CSV_URL) return;
@@ -308,6 +310,8 @@ const HousesSection = () => {
 
   const projetos = groupBy(houses, 'projeto');
   const nomes = Object.keys(projetos);
+  const nomesVisiveis = showAll ? nomes : nomes.slice(0, INITIAL_COUNT);
+  const temMais = nomes.length > INITIAL_COUNT;
 
   return (
     <section data-screen-label="casas" id="casas" style={{padding:'100px 0',background:'#fff'}}>
@@ -330,13 +334,33 @@ const HousesSection = () => {
         {loading ? (
           <div style={{textAlign:'center',padding:'60px 0',color:'var(--ink-3)'}}>Carregando obras…</div>
         ) : (
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:24}} className="projects-grid">
-            {nomes.map((nome,i) => (
-              <RevealDiv key={nome} delay={i*0.12}>
-                <ProjectCard projeto={nome} casas={projetos[nome]}/>
-              </RevealDiv>
-            ))}
-          </div>
+          <>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:24}} className="projects-grid">
+              {nomesVisiveis.map((nome,i) => (
+                <RevealDiv key={nome} delay={i*0.12}>
+                  <ProjectCard projeto={nome} casas={projetos[nome]}/>
+                </RevealDiv>
+              ))}
+            </div>
+
+            {temMais && (
+              <div style={{textAlign:'center',marginTop:36}}>
+                <Btn
+                  variant="ghost"
+                  size="lg"
+                  onClick={()=>setShowAll(s=>!s)}
+                  iconRight={<span style={{
+                    display:'inline-block',
+                    transition:'transform .3s ease',
+                    transform: showAll ? 'rotate(180deg)' : 'rotate(0deg)',
+                    fontSize:13
+                  }}>▼</span>}
+                >
+                  {showAll ? 'Mostrar menos' : `Mostrar todas as ${nomes.length} casas disponíveis`}
+                </Btn>
+              </div>
+            )}
+          </>
         )}
 
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:40,padding:'22px 28px',background:'var(--paper-2)',borderRadius:18,flexWrap:'wrap',gap:16}}>
