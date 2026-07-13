@@ -1,6 +1,6 @@
 // Shared utilities, buttons, formatters
-const WHATSAPP_URL = "https://wa.me/5563999496259?text=Olá, vim pelo site do Casa+ e quero sair do aluguel.";
-const PHONE_DISPLAY = "(63) 99949-6259";
+const WHATSAPP_URL = "https://wa.me/5563992324571?text=Olá, vim pelo site do Casa+ e quero sair do aluguel.";
+const PHONE_DISPLAY = "(63) 99232-4571";
 
 const fmtBRL = (v) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
 const fmtBRLd = (v) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
@@ -123,7 +123,7 @@ const Btn = ({variant='primary', size='md', icon, iconRight, children, className
 
 // WhatsApp link wrapper
 const WhatsLink = ({children, msg, ...p}) => {
-  const url = msg ? `https://wa.me/5563999496259?text=${encodeURIComponent(msg)}` : WHATSAPP_URL;
+  const url = msg ? `https://wa.me/5563992324571?text=${encodeURIComponent(msg)}` : WHATSAPP_URL;
   return <a href={url} target="_blank" rel="noopener noreferrer" {...p}>{children}</a>;
 };
 

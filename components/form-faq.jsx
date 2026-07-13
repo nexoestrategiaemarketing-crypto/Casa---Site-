@@ -608,7 +608,7 @@ const Footer = () => (
           <h4 style={{color:'#fff',fontFamily:'Inter',fontSize:13,fontWeight:600,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:16}}>Contato</h4>
           <ul style={{listStyle:'none',padding:0,margin:0,display:'flex',flexDirection:'column',gap:12,fontSize:14}}>
             <li><a href="https://maps.app.goo.gl/mLRBaXd5W54hVti7A" target="_blank" rel="noopener" style={{display:'flex',gap:9,alignItems:'center'}}><Icon.Pin size={14}/>Palmas · TO</a></li>
-            <li><WhatsLink style={{display:'flex',gap:9,alignItems:'center'}}><Icon.Phone size={14}/>(63) 99949-6259</WhatsLink></li>
+            <li><WhatsLink style={{display:'flex',gap:9,alignItems:'center'}}><Icon.Phone size={14}/>(63) 99232-4571</WhatsLink></li>
             <li><a href="mailto:casamais.incorp@gmail.com" style={{display:'flex',gap:9,alignItems:'center'}}><Icon.Mail size={14}/>casamais.incorp@gmail.com</a></li>
             <li style={{display:'flex',gap:9,alignItems:'center'}}><Icon.Clock size={14}/>Seg-Sex · 8h às 18h</li>
           </ul>

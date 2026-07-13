@@ -45,7 +45,7 @@ const Navbar = ({state, setState}) => {
         </nav>
 
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <a href={`tel:+5563999496259`} className="nav-phone" style={{
+          <a href={`tel:+5563992324571`} className="nav-phone" style={{
             display:'flex',alignItems:'center',gap:7,fontSize:13,fontWeight:600,
             color: scrolled ? 'var(--ink)' : '#fff'
           }}>
