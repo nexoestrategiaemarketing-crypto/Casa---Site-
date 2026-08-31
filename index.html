@@ -61,31 +61,9 @@
 <body>
 <div id="root"></div>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
-
-<script>
-(async () => {
-  const files = [
-    'components/icons.jsx',
-    'components/shared.jsx',
-    'components/nav-hero.jsx',
-    'components/middle.jsx',
-    'components/form-faq.jsx',
-    'components/tweaks.jsx',
-    'app.jsx'
-  ];
-  const v = Date.now();
-  for (const file of files) {
-    const res = await fetch(`${file}?v=${v}`);
-    const src = await res.text();
-    const compiled = Babel.transform(src, { presets: ['react'], filename: file });
-    // eslint-disable-next-line no-eval
-    (0, eval)(compiled.code);
-  }
-})();
-</script>
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script src="app.bundle.js?v=1"></script>
 
 </body>
 </html>
