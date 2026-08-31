@@ -34,8 +34,6 @@ const App = () => {
       <FinalCTA/>
       <Footer/>
       <WhatsFloat/>
-      <TweaksPanel state={state} setState={setState}/>
-      {state.showAnalysis && <AnalysisReport onClose={()=>setState(s=>({...s,showAnalysis:false}))}/>}
     </div>
   );
 };

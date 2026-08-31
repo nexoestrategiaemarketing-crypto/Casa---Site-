@@ -1,37 +1,3 @@
-// ================= TRUST BAR (social proof logos + numbers) =================
-const TrustBar = () => {
-  const items = [
-    {label:'Habilitada', sub:'CAIXA'},
-    {label:'Programa', sub:'Minha Casa Minha Vida'},
-    {label:'Governo', sub:'Federal'},
-    {label:'CRECI-TO', sub:'J-1127'},
-    {label:'Selo', sub:'Construtor Responsável'},
-  ];
-  return (
-    <section data-screen-label="trust" style={{
-      background:'var(--paper)',
-      borderBottom:'1px solid var(--line-2)',
-      padding:'22px 0'
-    }}>
-      <div className="wrap" style={{display:'flex',alignItems:'center',gap:40,justifyContent:'space-between',flexWrap:'wrap'}}>
-        <div style={{fontSize:11,fontWeight:700,color:'var(--ink-3)',letterSpacing:'.16em',textTransform:'uppercase',flexShrink:0}}>
-          Credenciamentos
-        </div>
-        <div style={{display:'flex',gap:36,alignItems:'center',flexWrap:'wrap',flex:1,justifyContent:'space-around'}}>
-          {items.map((it,i)=>(
-            <RevealDiv key={i} delay={i*0.08}>
-              <div style={{display:'flex',flexDirection:'column',gap:2,opacity:.72}}>
-                <div style={{fontSize:10,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--ink-3)',fontWeight:600}}>{it.label}</div>
-                <div style={{fontFamily:'Archivo',fontSize:18,fontWeight:700,color:'var(--ink)',letterSpacing:'-.01em'}}>{it.sub}</div>
-              </div>
-            </RevealDiv>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
 // ================= PAIN / EMPATHY =================
 const PainSection = () => {
   const dores = [
@@ -383,67 +349,6 @@ const HousesSection = () => {
         @media (max-width: 640px){ .projects-grid{grid-template-columns:1fr !important} }
       `}</style>
     </section>
-  );
-};
-
-const HouseCard = ({imagem,nome,bairro,valor,area,terreno,quartos,banheiros,vagas,tag,destaque,projeto}) => {
-  const [hover, setHover] = React.useState(false);
-  const parcela = estimateParcel({price:valor, income:3500, fgts:0}).parcela;
-  return (
-    <article style={{
-      borderRadius:18,overflow:'hidden',
-      background:'#fff',
-      border:'1px solid var(--line)',
-      transition:'all .25s ease',
-      transform: hover ? 'translateY(-4px)' : 'none',
-      boxShadow: hover ? 'var(--shadow-lg)' : 'var(--shadow-sm)',
-      position:'relative'
-    }} onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
-      {destaque && (
-        <div style={{position:'absolute',top:14,right:14,zIndex:2}}>
-          <Pill tone="bordo" style={{background:'var(--bordo)',color:'#fff'}}>
-            <Icon.Zap size={10}/> Mais procurada
-          </Pill>
-        </div>
-      )}
-      <div style={{position:'relative',overflow:'hidden',aspectRatio:'4/3'}}>
-        <img src={imagem} alt={nome||bairro} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform .5s ease',transform: hover ? 'scale(1.06)' : 'scale(1)'}}/>
-        <div style={{position:'absolute',top:14,left:14}}>
-          <Pill tone="paper" style={{background:'rgba(255,255,255,.95)',backdropFilter:'blur(6px)'}}>
-            <Icon.CheckCircle size={12}/> {tag}
-          </Pill>
-        </div>
-      </div>
-      <div style={{padding:'20px 22px 22px'}}>
-        <div style={{display:'flex',alignItems:'center',gap:6,color:'var(--ink-3)',fontSize:13,fontWeight:500}}>
-          <Icon.Pin size={13}/> {bairro} · Palmas/TO
-        </div>
-        <h3 style={{fontFamily:'Archivo',fontSize:24,fontWeight:700,margin:'6px 0 14px',letterSpacing:'-.02em',lineHeight:1.1}}>
-          {nome || `Casa ${quartos} quartos`}
-        </h3>
-
-        <div style={{display:'flex',gap:14,flexWrap:'wrap',paddingBottom:16,borderBottom:'1px dashed var(--line)',color:'var(--ink-2)',fontSize:13}}>
-          <span style={{display:'flex',alignItems:'center',gap:5}}><Icon.Ruler size={14}/>Área {area}m²</span>
-          {terreno>0 && <span style={{display:'flex',alignItems:'center',gap:5}}><Icon.Ruler size={14}/>Terreno {terreno}m²</span>}
-          <span style={{display:'flex',alignItems:'center',gap:5}}><Icon.Bed size={14}/>{quartos} qtos</span>
-          <span style={{display:'flex',alignItems:'center',gap:5}}><Icon.Bath size={14}/>{banheiros} ban.</span>
-          <span style={{display:'flex',alignItems:'center',gap:5}}><Icon.Car size={14}/>{vagas} vaga{vagas!==1?'s':''}</span>
-        </div>
-
-        <div style={{marginTop:16,display:'flex',alignItems:'end',justifyContent:'space-between',gap:10}}>
-          <div>
-            <div style={{fontSize:11,color:'var(--ink-3)',letterSpacing:'.08em',textTransform:'uppercase',fontWeight:600}}>A partir de</div>
-            <div style={{fontFamily:'Archivo',fontSize:26,fontWeight:700,color:'var(--bordo)',letterSpacing:'-.02em',lineHeight:1.05,marginTop:2}}>
-              {fmtBRL(parcela)}<span style={{fontSize:12,color:'var(--ink-3)',fontWeight:500,fontFamily:'Inter'}}>/mês</span>
-            </div>
-            <div style={{fontSize:12,color:'var(--ink-3)',marginTop:4}}>ou {fmtBRL(valor)} à vista</div>
-          </div>
-          <WhatsLink msg={`Olá, quero saber mais sobre a ${nome||'casa'} no ${bairro} (${projeto})`}>
-            <Btn variant="primary" size="sm" icon={<Icon.Whats size={14}/>}>Quero essa</Btn>
-          </WhatsLink>
-        </div>
-      </div>
-    </article>
   );
 };
 
@@ -819,4 +724,4 @@ const DeliveriesSection = () => {
   );
 };
 
-Object.assign(window, { TrustBar, PainSection, HousesSection, HouseCard, ProcessSection, BenefitsStrip, TeamSection, DeliveriesSection });
+Object.assign(window, { PainSection, HousesSection, ProcessSection, BenefitsStrip, TeamSection, DeliveriesSection });

@@ -3,7 +3,6 @@ const WHATSAPP_URL = "https://wa.me/5563992324571?text=Olá, vim pelo site do Ca
 const PHONE_DISPLAY = "(63) 99232-4571";
 
 const fmtBRL = (v) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
-const fmtBRLd = (v) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
 
 // MCMV parcel estimator: oficial Caixa (atualizado 2025)
 // F1: renda ≤3.200  | imóvel ≤255k | juros 4% a.a. | subsídio até R$55.000
@@ -147,19 +146,6 @@ const Pill = ({tone='bordo', children, style={}}) => {
   );
 };
 
-// Image placeholder (if asset missing)
-const ImgPh = ({label, ratio='16/10', style={}}) => (
-  <div style={{
-    aspectRatio:ratio,
-    background:'repeating-linear-gradient(45deg, oklch(0.90 0.02 50), oklch(0.90 0.02 50) 10px, oklch(0.93 0.02 50) 10px, oklch(0.93 0.02 50) 20px)',
-    color:'var(--ink-3)',
-    fontFamily:'ui-monospace,monospace',fontSize:12,
-    display:'flex',alignItems:'center',justifyContent:'center',
-    borderRadius:'inherit',
-    ...style
-  }}>{label}</div>
-);
-
 // Scroll-reveal wrapper — uses IntersectionObserver + .reveal-on-scroll CSS
 const RevealDiv = ({children, delay=0, style={}, className='', ...props}) => {
   const ref = React.useRef();
@@ -180,4 +166,4 @@ const RevealDiv = ({children, delay=0, style={}, className='', ...props}) => {
   );
 };
 
-Object.assign(window, { WHATSAPP_URL, PHONE_DISPLAY, fmtBRL, fmtBRLd, estimateParcel, minFaixaIncome, Btn, WhatsLink, Pill, ImgPh, RevealDiv });
+Object.assign(window, { WHATSAPP_URL, PHONE_DISPLAY, fmtBRL, estimateParcel, minFaixaIncome, Btn, WhatsLink, Pill, RevealDiv });
